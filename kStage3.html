@@ -1,0 +1,2044 @@
+<html>
+<head>
+<title> KEYBOARD STAGE 3 </title>
+
+<!-- copy and paste the next 2 lines to setup the sound files, you must modify the loadsoundchrome.js file with your sounds -->
+<script type="text/javascript" src="script/soundmanager2.js"></script>
+<script type="text/javascript" src="script/loadsoundchrome.js"></script>
+<!-- Stop copying here -->
+
+<center>
+    <script type="text/javascript" src="script/processing-1.4.1.js"></script>
+    <script type="text/processing" data-processing-target="mycanvas">
+
+/* @pjs globalKeyEvents = "true"; */
+
+
+
+//GAME
+int fRate;							//framerate (just incase)
+int gameOver;						//game over trigger
+int gameWon;						//game won trigger
+
+int next;							//next stage trigger
+int start;							//start bgm
+/*
+PImage pac;
+*/
+PImage red;
+PImage pink;
+PImage blu;
+
+//EXTRA VARIABLES (MULTIPURPOSE)
+int ext[] = new int [500];
+
+//animations
+int pac[] = new int [10];
+int expl[] = new int [10];
+int small[] = new int [300];
+int big[] = new int [300];
+int num[] = new int [300];
+int time[] = new int [300];
+int elec[] = new int [300];
+int n[] = new int[500];
+
+float radius = 20.0;
+int delay = 30;
+int delayP = 25;
+int slope;
+int fire1;							//MOUSE CLICKED TO SHOOT
+int b1, m1, m2, s1, s2, s3, s4;		//SPAWN/TRIGGERS
+int b2, m3, m4, s5, s6, s7, s8;
+
+int x[] = new int [500];				//X COORDINATES
+int y[] = new int [500];				//Y COORDINATES
+int xdir[] = new int [500];			//X DIRECTION
+int ydir[] = new int [500];			//Y DIRECTION
+int dist[] = new int [500];			//DISTANCES
+
+int speed = 1;
+
+//TIME LIMIT
+int initialTime = second();
+int currentTime = 0;
+int timeControl = 0;
+int minuteMultiplier = 0;
+
+//KEYBOARD
+int upKey = 0;
+int downKey = 0;
+int leftKey = 0;
+int rightKey = 0;
+int spaceKey = 0;
+
+//TARGET
+int targetX = 350;
+int targetY = 200;
+PImage target;
+
+//FONT
+PFont bird;
+
+
+void setup()
+{  
+    size( 700, 500 );  
+    background(125,0,0);
+    frameRate( 60 );
+	
+	//GAME
+	fRate = 60;
+	gameOver = 0;
+	gameWon = 0;
+	
+	start = 1;
+	next = 0;
+	
+	
+	//PLAYER
+	
+	n[0] = 1;
+	while (n[0] <= 4)
+	{
+		pac[n[0]] = loadImage("image/sprite/pac/pac"+n[0]+".png");
+		expl[n[0]] = loadImage("image/sprite/expl/expl"+n[0]+".png");
+		n[0] += 1;
+	}
+	
+	n[1] = 1;
+	while (n[1] <= 30)
+	{
+		time[n[1]] = 0;
+		n[1] += 1;
+	}
+	
+	n[2] = 1;
+	while (n[2] < 13)
+	{
+		if ( n[2] >= 1 && n[2] <= 3)
+		{
+			elec[n[2]] = loadImage("image/sprite/electleft/elect"+n[2]+".png");
+		}
+		if (n[2] >= 4 && n[2] <= 6)
+		{
+			elec[n[2]] = loadImage("image/sprite/electright/elect"+n[2]+".png");
+		}
+		if (n[2] >= 7 && n[2] <= 9)
+		{
+			elec[n[2]] = loadImage("image/sprite/electup/elect"+n[2]+".png");
+		}
+		if (n[2] >= 10 && n[2] <= 12)
+		{
+			elec[n[2]] = loadImage("image/sprite/electdown/elect"+n[2]+".png");
+		}
+		
+		n[2] += 1;
+	}
+	
+	
+	x[0] = 350;
+	y[0] = 250;
+	
+	x[1] = x[0];
+	y[1] = y[0];
+	
+	//PROJECT TILES
+	x[2] = x[0];
+	y[2] = y[0];
+	fire1 = 0;
+	x[3] = x[2];
+	y[3] = y[2];
+	slope = 0;
+	x[4] = 0;
+	y[4] = 0;
+	
+	
+	//OBJECTS
+	x[5] = 100;
+	y[5] = 100;
+	x[6] = -1500;
+	y[6] = -1500;
+	x[7] = -1500;
+	y[7] = -1500;
+	x[8] = -1500;
+	y[8] = -1500;
+	x[9] = -1500;
+	y[9] = -1500;
+	x[10] = -1500;
+	y[10] = -1500;
+	x[11] = -1500;
+	y[11] = -1500;
+	
+	b1 = 1;
+	m1 = 0;
+	m2 = 0;
+	s1 = 0;
+	s2 = 0;
+	s3 = 0;
+	s4 = 0;
+	
+	xdir[0] = int(random(0,1.3));
+	ydir[0] = int(random(0,1.3));
+	xdir[1] = int(random(0,2));
+	xdir[2] = int(random(0,2));
+	ydir[1] = int(random(0,1.3));
+	ydir[2] = int(random(0,1.3));
+	xdir[3] = int(random(0,2));
+	xdir[4] = int(random(0,2));
+	xdir[5] = int(random(0,1.3));
+	xdir[6] = int(random(0,1.3));
+	ydir[3] = int(random(0,2));
+	ydir[4] = int(random(0,2));
+	ydir[5] = int(random(0,1.3));
+	ydir[6] = int(random(0,1.3));
+	
+	
+	//SECOND
+	x[12] = 600;
+	y[12] = 100;
+	x[13] = -1500;
+	y[13] = -1500;
+	x[14] = -1500;
+	y[14] = -1500;
+	x[15] = -1500;
+	y[15] = -1500;
+	x[16] = -1500;
+	y[16] = -1500;
+	x[17] = -1500;
+	y[17] = -1500;
+	x[18] = -1500;
+	y[18] = -1500;
+	
+	b2 = 1;
+	m3 = 0;
+	m4 = 0;
+	s5 = 0;
+	s6 = 0;
+	s7 = 0;
+	s8 = 0;
+	
+	xdir[7] = int(random(0,1.3));
+	ydir[7] = int(random(0,1.3));
+	xdir[8] = int(random(0,2));
+	xdir[9] = int(random(0,2));
+	ydir[8] = int(random(0,1.3));
+	ydir[9] = int(random(0,1.3));
+	xdir[10] = int(random(0,2));
+	xdir[11] = int(random(0,2));
+	xdir[12] = int(random(0,1.3));
+	xdir[13] = int(random(0,1.3));
+	ydir[10] = int(random(0,2));
+	ydir[11] = int(random(0,2));
+	ydir[12] = int(random(0,1.3));
+	ydir[13] = int(random(0,1.3));
+	
+	red = loadImage("image/red.png");
+	pink = loadImage("image/pink.png");
+	blu = loadImage("image/blue.png");
+	
+	target = loadImage("image/target.png")
+	
+	bird = loadFont("Birdman");
+	
+}  
+
+
+void draw()
+{
+    background(0,0,0);
+    frameRate ( fRate );
+    
+	if (start == 1)
+   	{
+   		soundManager.play('s0');
+   		
+   		start = 0;
+   	}
+
+//GAME------------------------------------------------------------------------------------
+	if (gameOver == 1)
+	{
+		link ("over.html");
+	}
+	
+//BOUNDARIES------------------------------------------------------------------------------
+
+	num[8] = 1;
+	big[8] = 3;
+	small[8] = 0;
+	while (small[8] < 10)
+	{
+		if (time[9] >= small[8] && time[9] < big[8])
+		{
+			image(elec[num[8]],0,0,20,500);
+		}
+		
+		num[8] += 1;
+		small[8] += 3;
+		big[8] += 3;
+	}
+	
+	num[9] = 4;
+	big[9] = 3;
+	small[9] = 0;
+	while (small[9] < 10)
+	{
+		if (time[9] >= small[9] && time[9] < big[9])
+		{
+			image(elec[num[9]],680,0,20,500);
+		}
+		
+		num[9] += 1;
+		small[9] += 3;
+		big[9] += 3;
+	}
+	
+	num[10] = 7;
+	big[10] = 3;
+	small[10] = 0;
+	while (small[10] < 10)
+	{
+		if (time[9] >= small[10] && time[9] < big[10])
+		{
+			image(elec[num[10]],0,0,700,20);
+		}
+		
+		num[10] += 1;
+		small[10] += 3;
+		big[10] += 3;
+	}
+	
+	num[11] = 10;
+	big[11] = 3;
+	small[11] = 0;
+	while (small[11] < 10)
+	{
+		if (time[9] >= small[11] && time[9] < big[11])
+		{
+			image(elec[num[11]],0,480,700,20);
+		}
+		
+		num[11] += 1;
+		small[11] += 3;
+		big[11] += 3;
+	}
+	
+	if (time[9] >= 10)
+	{
+		time[9] = 0;
+	}
+	
+	time[9] += 1;
+
+//PLAYER----------------------------------------------------------------------------------
+	
+	small[0] = 0;
+	big[0] = 5;
+	num[0] = 1;
+	while (small[0] < 21)
+	{
+		if (time[1] >= small[0] && time[1] < big[0])
+		{
+			image(pac[num[0]], x[0]-15,y[0]-15,40,40);
+		}
+		
+		x[0] += (x[1]-x[0])/delay;
+		y[0] += (y[1]-y[0])/delay;
+		
+		num[0] += 1;
+		small[0] += 5;
+		big[0] += 5;
+	}
+	
+	
+	if (time[1] >= 16)
+	{
+		time[1] = 0;
+	}
+	
+	time[1] += 1;
+	
+	
+//PROJECTILES-----------------------------------------------------------------------------
+
+	
+	fill (255,255,255,ext[1]);
+	stroke (0,0);
+	ellipse (x[2],y[2],10,10);
+	
+	if (x[2] <= 0 || x[2] >= 700)
+	{
+		x[2] = x[0];
+		fire1 = 0;
+	}
+	
+	if (y[2] <= 0 || y[2] >= 500)
+	{
+		y[2] = y[0];
+		fire1 = 0;
+	}
+	
+	if (fire1 == 0)
+	{
+		x[2] = x[0];
+		y[2] = y[0];
+		ext[1] = 0;
+	}
+	
+	if (fire1 == 1)
+	{	
+		x[2]+=x[4]/delayP;
+		y[2]+=y[4]/delayP;
+		
+		ext[1] = 255;
+		
+	}
+	
+	
+//OBJECTS---------------------------------------------------------------------------------
+									//FIRST (BIG)
+	if (b1 == 1)
+	{
+		fill (255,0,0);
+		image (red,x[5]-50,y[5]-50,100,100);
+	
+		if (xdir[0] == 0) //DIRECTIONS
+		{
+			x[5] = x[5] + 3 *speed;	
+		}
+	
+		if (xdir[0] == 1)
+		{
+			x[5] = x[5] - 3 *speed;
+		}
+	
+		if (ydir[0] == 0)
+		{
+			y[5] = y[5] + 3 *speed;
+		}
+	
+		if (ydir[0] == 1)
+		{
+			y[5] = y[5] - 3 *speed;
+		}
+	
+		if (x[5] >= 670) //BOUNDARIES
+		{
+			xdir[0] = 1;
+		}
+	
+		if (x[5] <= 30)
+		{
+			xdir[0] = 0;
+		}
+	
+		if (y[5] >= 470)
+		{
+			ydir[0] = 1;
+		}
+	
+		if (y[5] <= 30)
+		{
+			ydir[0] = 0;
+		}
+	}
+	
+							//SECOND 2x MEDUIM (FASTER)
+	if (m1 == 0 && b1 == 1 || m2 == 0 && b1 == 1)
+	{
+		x[6] = x[5];
+		x[7] = x[5];
+		y[6] = y[5];
+		y[7] = y[5];
+	}
+	
+	if (m1 == 1)
+	{
+		x[5] = 1500;
+		y[5] = 1500;
+		
+		fill (255,0,0);
+		image (pink,x[6]-25,y[6]-25,50,50);
+	
+		if (xdir[1] == 0) //DIRECTIONS
+		{
+			x[6] = x[6] + 5 *speed;	
+		}
+	
+		if (xdir[1] == 1)
+		{
+			x[6] = x[6] - 6 *speed;
+		}
+	
+		if (ydir[1] == 0)
+		{
+			y[6] = y[6] + 6 *speed;
+		}
+	
+		if (ydir[1] == 1)
+		{
+			y[6] = y[6] - 5 *speed;
+		}
+	
+		if (x[6] >= 670) //BOUNDARIES
+		{
+			xdir[1] = 1;
+		}
+	
+		if (x[6] <= 30)
+		{
+			xdir[1] = 0;
+		}
+	
+		if (y[6] >= 470)
+		{
+			ydir[1] = 1;
+		}
+	
+		if (y[6] <= 30)
+		{
+			ydir[1] = 0;
+		}
+	}
+	
+	if (m2 == 1)
+	{
+		fill (255,0,0);
+		image (pink,x[7]-25,y[7]-25,50,50);
+	
+		if (xdir[2] == 0) //DIRECTIONS
+		{
+			x[7] = x[7] + 6 *speed;	
+		}
+	
+		if (xdir[2] == 1)
+		{
+			x[7] = x[7] - 5 *speed;
+		}
+	
+		if (ydir[2] == 0)
+		{
+			y[7] = y[7] + 5 *speed;
+		}
+	
+		if (ydir[2] == 1)
+		{
+			y[7] = y[7] - 6 *speed;
+		}
+	
+		if (x[7] >= 670) //BOUNDARIES
+		{
+			xdir[2] = 1;
+		}
+	
+		if (x[7] <= 30)
+		{
+			xdir[2] = 0;
+		}
+	
+		if (y[7] >= 470)
+		{
+			ydir[2] = 1;
+		}
+	
+		if (y[7] <= 30)
+		{
+			ydir[2] = 0;
+		}
+	
+	}
+	
+						//THIRD 4x (2 each) SMALL OBJECTS FASTER
+	if (s1 == 0 && m1 == 1 || s2 == 0 && m1 == 1)
+	{
+		x[8] = x[6];
+		x[9] = x[6];
+		y[8] = y[6];
+		y[9] = y[6];
+	}
+	
+	if (s1 == 1)
+	{
+		x[6] = 1500;
+		y[6] = 1500;
+		
+		fill (255,0,0);
+		image (blu,x[8]-15,y[8]-15,30,30);
+	
+		if (xdir[3] == 0) //DIRECTIONS
+		{
+			x[8] = x[8] + 5 *speed;	
+		}
+	
+		if (xdir[3] == 1)
+		{
+			x[8] = x[8] - 6 *speed;
+		}
+	
+		if (ydir[3] == 0)
+		{
+			y[8] = y[8] + 5 *speed;
+		}
+	
+		if (ydir[3] == 1)
+		{
+			y[8] = y[8] - 6 *speed;
+		}
+	
+		if (x[8] >= 670) //BOUNDARIES
+		{
+			xdir[3] = 1;
+		}
+	
+		if (x[8] <= 30)
+		{
+			xdir[3] = 0;
+		}
+	
+		if (y[8] >= 470)
+		{
+			ydir[3] = 1;
+		}
+	
+		if (y[8] <= 30)
+		{
+			ydir[3] = 0;
+		}
+	}
+	
+	if (s2 == 1)
+	{
+		fill (255,0,0);
+		image (blu,x[9]-15,y[9]-15,30,30);
+	
+		if (xdir[4] == 0) //DIRECTIONS
+		{
+			x[9] = x[9] + 5 *speed;	
+		}
+	
+		if (xdir[4] == 1)
+		{
+			x[9] = x[9] - 6 *speed;
+		}
+	
+		if (ydir[4] == 0)
+		{
+			y[9] = y[9] + 6 *speed;
+		}
+	
+		if (ydir[4] == 1)
+		{
+			y[9] = y[9] - 5 *speed;
+		}
+	
+		if (x[9] >= 670) //BOUNDARIES
+		{
+			xdir[4] = 1;
+		}
+	
+		if (x[9] <= 30)
+		{
+			xdir[4] = 0;
+		}
+	
+		if (y[9] >= 470)
+		{
+			ydir[4] = 1;
+		}
+	
+		if (y[9] <= 30)
+		{
+			ydir[4] = 0;
+		}
+	}
+
+	if (s3 == 0 && m2 == 1 || s4 == 0 && m2 == 1)
+	{
+		x[10] = x[7];
+		x[11] = x[7];
+		y[10] = y[7];
+		y[11] = y[7];
+	}
+	
+	if (s3 == 1)
+	{
+		x[7] = 1500;
+		y[7] = 1500;
+		
+		fill (255,0,0);
+		image (blu,x[10]-15,y[10]-15,30,30);
+	
+		if (xdir[5] == 0) //DIRECTIONS
+		{
+			x[10] = x[10] + 6 *speed;	
+		}
+	
+		if (xdir[5] == 1)
+		{
+			x[10] = x[10] - 5 *speed;
+		}
+	
+		if (ydir[5] == 0)
+		{
+			y[10] = y[10] + 6 *speed;
+		}
+	
+		if (ydir[5] == 1)
+		{
+			y[10] = y[10] - 5 *speed;
+		}
+	
+		if (x[10] >= 670) //BOUNDARIES
+		{
+			xdir[5] = 1;
+		}
+	
+		if (x[10] <= 30)
+		{
+			xdir[5] = 0;
+		}
+	
+		if (y[10] >= 470)
+		{
+			ydir[5] = 1;
+		}
+	
+		if (y[10] <= 30)
+		{
+			ydir[5] = 0;
+		}
+	}
+	
+	if (s4 == 1)
+	{
+		fill (255,0,0);
+		image (blu,x[11]-15,y[11]-15,30,30);
+	
+		if (xdir[6] == 0) //DIRECTIONS
+		{
+			x[11] = x[11] + 6 *speed;	
+		}
+	
+		if (xdir[6] == 1)
+		{
+			x[11] = x[11] - 7 *speed;
+		}
+	
+		if (ydir[6] == 0)
+		{
+			y[11] = y[11] + 7 *speed;
+		}
+	
+		if (ydir[6] == 1)
+		{
+			y[11] = y[11] - 6 *speed;
+		}
+	
+		if (x[11] >= 670) //BOUNDARIES
+		{
+			xdir[6] = 1;
+		}
+	
+		if (x[11] <= 30)
+		{
+			xdir[6] = 0;
+		}
+	
+		if (y[11] >= 470)
+		{
+			ydir[6] = 1;
+		}
+	
+		if (y[11] <= 30)
+		{
+			ydir[6] = 0;
+		}
+	}
+	
+//SECOND----------------------------------------------------------------------------------
+	if (b2 == 1)
+	{
+		fill (255,0,0);
+		image (red,x[12]-50,y[12]-50,100,100);
+	
+		if (xdir[7] == 0) //DIRECTIONS
+		{
+			x[12] = x[12] + 3 *speed;	
+		}
+	
+		if (xdir[7] == 1)
+		{
+			x[12] = x[12] - 3 *speed;
+		}
+	
+		if (ydir[7] == 0)
+		{
+			y[12] = y[12] + 3 *speed;
+		}
+	
+		if (ydir[7] == 1)
+		{
+			y[12] = y[12] - 3 *speed;
+		}
+	
+		if (x[12] >= 670) //BOUNDARIES
+		{
+			xdir[7] = 1;
+		}
+	
+		if (x[12] <= 30)
+		{
+			xdir[7] = 0;
+		}
+	
+		if (y[12] >= 470)
+		{
+			ydir[7] = 1;
+		}
+	
+		if (y[12] <= 30)
+		{
+			ydir[7] = 0;
+		}
+	}
+	
+							//SECOND 2x MEDUIM (FASTER)
+	if (m3 == 0 && b2 == 1 || m4 == 0 && b2 == 1)
+	{
+		x[13] = x[12];
+		x[14] = x[12];
+		y[13] = y[12];
+		y[14] = y[12];
+	}
+	
+	if (m3 == 1)
+	{
+		x[12] = 1500;
+		y[12] = 1500;
+		
+		fill (255,0,0);
+		image (pink,x[13]-25,y[13]-25,50,50);
+	
+		if (xdir[8] == 0) //DIRECTIONS
+		{
+			x[13] = x[13] + 5 *speed;	
+		}
+	
+		if (xdir[8] == 1)
+		{
+			x[13] = x[13] - 6 *speed;
+		}
+	
+		if (ydir[8] == 0)
+		{
+			y[13] = y[13] + 6 *speed;
+		}
+	
+		if (ydir[8] == 1)
+		{
+			y[13] = y[13] - 5 *speed;
+		}
+	
+		if (x[13] >= 670) //BOUNDARIES
+		{
+			xdir[8] = 1;
+		}
+	
+		if (x[13] <= 30)
+		{
+			xdir[8] = 0;
+		}
+	
+		if (y[13] >= 470)
+		{
+			ydir[8] = 1;
+		}
+	
+		if (y[13] <= 30)
+		{
+			ydir[8] = 0;
+		}
+	}
+	
+	if (m4 == 1)
+	{
+		fill (255,0,0);
+		image (pink,x[14]-25,y[14]-25,50,50);
+	
+		if (xdir[9] == 0) //DIRECTIONS
+		{
+			x[14] = x[14] + 6 *speed;	
+		}
+	
+		if (xdir[9] == 1)
+		{
+			x[14] = x[14] - 5 *speed;
+		}
+	
+		if (ydir[9] == 0)
+		{
+			y[14] = y[14] + 5 *speed;
+		}
+	
+		if (ydir[9] == 1)
+		{
+			y[14] = y[14] - 6 *speed;
+		}
+	
+		if (x[14] >= 670) //BOUNDARIES
+		{
+			xdir[9] = 1;
+		}
+	
+		if (x[14] <= 30)
+		{
+			xdir[9] = 0;
+		}
+	
+		if (y[14] >= 470)
+		{
+			ydir[9] = 1;
+		}
+	
+		if (y[14] <= 30)
+		{
+			ydir[9] = 0;
+		}
+	
+	}
+	
+						//THIRD 4x (2 each) SMALL OBJECTS FASTER
+	if (s5 == 0 && m3 == 1 || s6 == 0 && m3 == 1)
+	{
+		x[15] = x[13];
+		x[16] = x[13];
+		y[15] = y[13];
+		y[16] = y[13];
+	}
+	
+	if (s5 == 1)
+	{
+		x[13] = 1500;
+		y[13] = 1500;
+		
+		fill (255,0,0);
+		image (blu,x[15]-15,y[15]-15,30,30);
+	
+		if (xdir[10] == 0) //DIRECTIONS
+		{
+			x[15] = x[15] + 5 *speed;	
+		}
+	
+		if (xdir[10] == 1)
+		{
+			x[15] = x[15] - 6 *speed;
+		}
+	
+		if (ydir[10] == 0)
+		{
+			y[15] = y[15] + 5 *speed;
+		}
+	
+		if (ydir[10] == 1)
+		{
+			y[15] = y[15] - 6 *speed;
+		}
+	
+		if (x[15] >= 670) //BOUNDARIES
+		{
+			xdir[10] = 1;
+		}
+	
+		if (x[15] <= 30)
+		{
+			xdir[10] = 0;
+		}
+	
+		if (y[15] >= 470)
+		{
+			ydir[10] = 1;
+		}
+	
+		if (y[15] <= 30)
+		{
+			ydir[10] = 0;
+		}
+	}
+	
+	if (s6 == 1)
+	{
+		fill (255,0,0);
+		image (blu,x[16]-15,y[16]-15,30,30);
+	
+		if (xdir[11] == 0) //DIRECTIONS
+		{
+			x[16] = x[16] + 5 *speed;	
+		}
+	
+		if (xdir[11] == 1)
+		{
+			x[16] = x[16] - 6 *speed;
+		}
+	
+		if (ydir[11] == 0)
+		{
+			y[16] = y[16] + 6 *speed;
+		}
+	
+		if (ydir[11] == 1)
+		{
+			y[16] = y[16] - 5 *speed;
+		}
+	
+		if (x[16] >= 670) //BOUNDARIES
+		{
+			xdir[11] = 1;
+		}
+	
+		if (x[16] <= 30)
+		{
+			xdir[11] = 0;
+		}
+	
+		if (y[16] >= 470)
+		{
+			ydir[11] = 1;
+		}
+	
+		if (y[16] <= 30)
+		{
+			ydir[11] = 0;
+		}
+	}
+
+	if (s7 == 0 && m4 == 1 || s8 == 0 && m4 == 1)
+	{
+		x[17] = x[14];
+		x[18] = x[14];
+		y[17] = y[14];
+		y[18] = y[14];
+	}
+	
+	if (s7 == 1)
+	{
+		x[14] = 1500;
+		y[14] = 1500;
+		
+		fill (255,0,0);
+		image (blu,x[17]-15,y[17]-15,30,30);
+	
+		if (xdir[12] == 0) //DIRECTIONS
+		{
+			x[17] = x[17] + 6 *speed;	
+		}
+	
+		if (xdir[12] == 1)
+		{
+			x[17] = x[17] - 5 *speed;
+		}
+	
+		if (ydir[12] == 0)
+		{
+			y[17] = y[17] + 6 *speed;
+		}
+	
+		if (ydir[12] == 1)
+		{
+			y[17] = y[17] - 5 *speed;
+		}
+	
+		if (x[17] >= 670) //BOUNDARIES
+		{
+			xdir[12] = 1;
+		}
+	
+		if (x[17] <= 30)
+		{
+			xdir[12] = 0;
+		}
+	
+		if (y[17] >= 470)
+		{
+			ydir[12] = 1;
+		}
+	
+		if (y[17] <= 30)
+		{
+			ydir[12] = 0;
+		}
+	}
+	
+	if (s8 == 1)
+	{
+		fill (255,0,0);
+		image (blu,x[18]-15,y[18]-15,30,30);
+	
+		if (xdir[13] == 0) //DIRECTIONS
+		{
+			x[18] = x[18] + 6 *speed;	
+		}
+	
+		if (xdir[13] == 1)
+		{
+			x[18] = x[18] - 7 *speed;
+		}
+	
+		if (ydir[13] == 0)
+		{
+			y[18] = y[18] + 7 *speed;
+		}
+	
+		if (ydir[13] == 1)
+		{
+			y[18] = y[18] - 6 *speed;
+		}
+	
+		if (x[18] >= 670) //BOUNDARIES
+		{
+			xdir[13] = 1;
+		}
+	
+		if (x[18] <= 30)
+		{
+			xdir[13] = 0;
+		}
+	
+		if (y[18] >= 470)
+		{
+			ydir[13] = 1;
+		}
+	
+		if (y[18] <= 30)
+		{
+			ydir[13] = 0;
+		}
+	}
+
+
+//COLLISION (KILLED ENEMY- HIT ENEMY)-----------------------------------------------------
+	//distance formulas
+	dist[0] = (int)sqrt(sq(x[2]-x[5])+sq(y[2]-y[5]));
+	dist[2] = (int)sqrt(sq(x[2]-x[6])+sq(y[2]-y[6]));
+	dist[3] = (int)sqrt(sq(x[2]-x[7])+sq(y[2]-y[7]));
+	dist[6] = (int)sqrt(sq(x[2]-x[8])+sq(y[2]-y[8]));
+	dist[7] = (int)sqrt(sq(x[2]-x[9])+sq(y[2]-y[9]));
+	dist[8] = (int)sqrt(sq(x[2]-x[10])+sq(y[2]-y[10]));
+	dist[9] = (int)sqrt(sq(x[2]-x[11])+sq(y[2]-y[11]));
+	
+	dist[10] = (int)sqrt(sq(x[2]-x[12])+sq(y[2]-y[12]));
+	dist[11] = (int)sqrt(sq(x[2]-x[13])+sq(y[2]-y[13]));
+	dist[12] = (int)sqrt(sq(x[2]-x[14])+sq(y[2]-y[14]));
+	dist[13] = (int)sqrt(sq(x[2]-x[15])+sq(y[2]-y[15]));
+	dist[14] = (int)sqrt(sq(x[2]-x[16])+sq(y[2]-y[16]));
+	dist[15] = (int)sqrt(sq(x[2]-x[17])+sq(y[2]-y[17]));
+	dist[16] = (int)sqrt(sq(x[2]-x[18])+sq(y[2]-y[18]));
+	
+	
+	//collisions
+	if (dist[0] <= 35 && fire1 == 1 && b1 == 1) //big easy
+	{
+		
+		soundManager.play('s2');
+		
+		b1 = 0;
+		ext[0] = 1;
+		fire1 = 0;		//prevent multikills with one shot
+		
+	}
+	
+	if (b1 == 0)
+	{
+		
+		small[1] = 0;
+		big[1] = 3;
+		num[1] = 1;
+		while (small[1] < 30)
+		{
+			if (time[2] >= small[1] && time[2] < big[1])
+			{
+				image(expl[num[1]],x[5]-25,y[5]-25,50,50);
+			}
+		
+			num[1] += 1;
+			small[1] += 3;
+			big[1] += 3;
+		
+		}
+		
+		if (time[2] < 20)
+		{
+			time[2] += 0.5;
+		}
+	}
+	
+	
+	if (time[2] >= 20 && ext[0] == 1)
+	{
+		m1 = 1;
+		m2 = 1;
+		time[2] = 0;
+		ext[0] = 0;
+	}
+	
+	
+	
+	//DEATH OF MEZZO
+	
+	if (dist[2] <= 25 && fire1 == 1 && m1 == 1)  //medium normal
+	{
+		soundManager.play('s2');
+		
+		m1 = 0;
+		ext[2] = 1;
+		fire1 = 0;
+		
+	}
+	
+	if (m1 == 0 && ext[2] == 1)
+	{
+		
+		small[2] = 0;
+		big[2] = 3;
+		num[2] = 1;
+		while (small[2] < 30)
+		{
+			if (time[3] >= small[2] && time[3] < big[2])
+			{
+				image(expl[num[2]],x[6]-25,y[6]-25,40,40);
+			}
+		
+			num[2] += 1;
+			small[2] += 3;
+			big[2] += 3;
+		
+		}
+		
+		if (time[3] < 20)
+		{
+			time[3] += 0.5;
+		}
+	}
+	
+	if (time[3] >= 20 && ext[2] == 1)
+	{
+		s1 = 1;
+		s2 = 1;
+		time[3] = 0;
+		ext[2] = 0;
+	}
+	
+	
+	//DEATH OF MEZZO AMI
+	
+	if (dist[3] <= 25 && fire1 == 1 && m2 == 1)
+	{
+		soundManager.play('s2');
+		
+		m2 = 0;
+		ext[3] = 1;
+		
+		fire1 = 0;
+		
+	
+	}
+	
+	if (m2 == 0 && ext[3] == 1)
+	{
+		
+		small[3] = 0;
+		big[3] = 3;
+		num[3] = 1;
+		while (small[3] < 30)
+		{
+			if (time[4] >= small[3] && time[4] < big[3])
+			{
+				image(expl[num[3]],x[7]-25,y[7]-25,40,40);
+			}
+		
+			num[3] += 1;
+			small[3] += 3;
+			big[3] += 3;
+		
+		}
+		
+		if (time[4] < 20)
+		{
+			time[4] += 0.5;
+		}
+	}
+	
+	if (time[4] >= 20 && ext[3] == 1)
+	{
+		s3 = 1;
+		s4 = 1;
+		time[4] = 0;
+		ext[3] = 0;
+	}
+	
+	
+	
+	//DEATH OF PICCOLOA UNO
+	
+	if (dist[6] <= 15 && fire1 == 1 && s1 == 1)  //small hard
+	{
+		soundManager.play('s2');
+		
+		s1 = 0;
+		ext[4] = 1;
+		fire1 = 0;
+	
+	}
+	
+	if (s1 == 0 && ext[4] == 1)
+	{
+		
+		small[4] = 0;
+		big[4] = 3;
+		num[4] = 1;
+		while (small[4] < 30)
+		{
+			if (time[5] >= small[4] && time[5] < big[4])
+			{
+				image(expl[num[4]],x[8]-25,y[8]-25,30,30);
+			}
+		
+			num[4] += 1;
+			small[4] += 3;
+			big[4] += 3;
+		
+		}
+		
+		if (time[5] < 20)
+		{
+			time[5] += 0.5;
+		}
+	}
+	
+	if (time[5] >= 20 && ext[4] == 1)
+	{
+		
+		time[5] = 0;
+		x[8] = -1500;
+		ext[4] = 0;
+	}
+	
+	
+	//PICCOLOA DOS MORTE
+	if (dist[7] <= 15 && fire1 == 1 && s2 == 1)
+	{
+		soundManager.play('s2');
+		
+		s2 = 0;
+		ext[5] = 1;
+		fire1 = 0;
+		
+	}
+	
+	if (s2 == 0 && ext[5] == 1)
+	{
+		
+		small[5] = 0;
+		big[5] = 3;
+		num[5] = 1;
+		while (small[5] < 30)
+		{
+			if (time[6] >= small[5] && time[6] < big[5])
+			{
+				image(expl[num[5]],x[9]-25,y[9]-25,30,30);
+			}
+		
+			num[5] += 1;
+			small[5] += 3;
+			big[5] += 3;
+		
+		}
+		
+		if (time[6] < 20)
+		{
+			time[6] += 0.5;
+		}
+	}
+	
+	if (time[6] >= 20 && ext[5] == 1)
+	{
+		
+		time[6] = 0;
+		x[9] = -1500;
+		ext[5] = 0;
+	}
+	
+	
+	//PICCOLOA TRES MORTE
+	
+	if (dist[8] <= 15 && fire1 == 1 && s3 == 1)
+	{
+		soundManager.play('s2');
+		
+		s3 = 0;	
+		ext[6] = 1;
+		fire1 = 0;
+		
+	}
+	
+	if (s3 == 0 && ext[6] == 1)
+	{
+		
+		small[6] = 0;
+		big[6] = 3;
+		num[6] = 1;
+		while (small[6] < 30)
+		{
+			if (time[7] >= small[6] && time[7] < big[6])
+			{
+				image(expl[num[6]],x[10]-25,y[10]-25,30,30);
+			}
+		
+			num[6] += 1;
+			small[6] += 3;
+			big[6] += 3;
+		
+		}
+		
+		if (time[7] < 20)
+		{
+			time[7] += 0.5;
+		}
+	}
+	
+	if (time[7] >= 20 && ext[6] == 1)
+	{
+		
+		time[7] = 0;
+		x[10] = -1500;
+		ext[6] = 0;
+	}
+	
+	
+	//PICCOLOA CUATRO MORTE
+	
+	if (dist[9] <= 15 && fire1 == 1 && s4 == 1)
+	{
+		soundManager.play('s2');
+		
+		s4 = 0;
+		ext[7] = 1;
+		fire1 = 0;
+		
+	}
+	
+	if (s4 == 0 && ext[7] == 1)
+	{
+		
+		small[7] = 0;
+		big[7] = 3;
+		num[7] = 1;
+		while (small[7] < 30)
+		{
+			if (time[8] >= small[7] && time[8] < big[7])
+			{
+				image(expl[num[7]],x[11]-25,y[11]-25,30,30);
+			}
+		
+			num[7] += 1;
+			small[7] += 3;
+			big[7] += 3;
+		
+		}
+		
+		if (time[8] < 20)
+		{
+			time[8] += 0.5;
+		}
+	}
+	
+	if (time[8] >= 20 && ext[7] == 1)
+	{
+		
+		time[8] = 0;
+		x[11] = -1500;
+		ext[7] = 0;
+	}
+	
+	
+	
+	//second SET
+	if (dist[10] <= 35 && fire1 == 1 && b2 == 1) //big easy
+	{
+		
+		soundManager.play('s6');
+		
+		b2 = 0;
+		ext[80] = 1;
+		fire1 = 0;		//prevent multikills with one shot
+		
+	}
+	
+	if (b2 == 0)
+	{
+		
+		small[81] = 0;
+		big[81] = 3;
+		num[81] = 1;
+		while (small[81] < 30)
+		{
+			if (time[82] >= small[81] && time[82] < big[81])
+			{
+				image(expl[num[81]],x[12]-25,y[12]-25,50,50);
+			}
+		
+			num[81] += 1;
+			small[81] += 3;
+			big[81] += 3;
+		
+		}
+		
+		if (time[82] < 20)
+		{
+			time[82] += 0.5;
+		}
+	}
+	
+	
+	if (time[82] >= 20 && ext[80] == 1)
+	{
+		m3 = 1;
+		m4 = 1;
+		time[82] = 0;
+		ext[80] = 0;
+	}
+	
+	
+	
+	//DEATH OF MEZZO
+	
+	if (dist[11] <= 25 && fire1 == 1 && m3 == 1)  //medium normal
+	{
+		soundManager.play('s6');
+		
+		m3 = 0;
+		ext[82] = 1;
+		fire1 = 0;
+		
+	}
+	
+	if (m3 == 0 && ext[82] == 1)
+	{
+		
+		small[82] = 0;
+		big[82] = 3;
+		num[82] = 1;
+		while (small[82] < 30)
+		{
+			if (time[83] >= small[82] && time[83] < big[82])
+			{
+				image(expl[num[82]],x[13]-25,y[13]-25,40,40);
+			}
+		
+			num[82] += 1;
+			small[82] += 3;
+			big[82] += 3;
+		
+		}
+		
+		if (time[83] < 20)
+		{
+			time[83] += 0.5;
+		}
+	}
+	
+	if (time[83] >= 20 && ext[82] == 1)
+	{
+		s5 = 1;
+		s6 = 1;
+		time[83] = 0;
+		ext[82] = 0;
+	}
+	
+	
+	//DEATH OF MEZZO AMI
+	
+	if (dist[12] <= 25 && fire1 == 1 && m4 == 1)
+	{
+		soundManager.play('s6');
+		
+		m4 = 0;
+		ext[83] = 1;
+		
+		fire1 = 0;
+		
+	
+	}
+	
+	if (m4 == 0 && ext[83] == 1)
+	{
+		
+		small[83] = 0;
+		big[83] = 3;
+		num[83] = 1;
+		while (small[83] < 30)
+		{
+			if (time[84] >= small[83] && time[84] < big[83])
+			{
+				image(expl[num[83]],x[14]-25,y[14]-25,40,40);
+			}
+		
+			num[83] += 1;
+			small[83] += 3;
+			big[83] += 3;
+		
+		}
+		
+		if (time[84] < 20)
+		{
+			time[84] += 0.5;
+		}
+	}
+	
+	if (time[84] >= 20 && ext[83] == 1)
+	{
+		s7 = 1;
+		s8 = 1;
+		time[84] = 0;
+		ext[83] = 0;
+	}
+	
+	
+	
+	//DEATH OF PICCOLOA UNO
+	
+	if (dist[13] <= 15 && fire1 == 1 && s5 == 1)  //small hard
+	{
+		soundManager.play('s6');
+		
+		s5 = 0;
+		ext[84] = 1;
+		fire1 = 0;
+	
+	}
+	
+	if (s5 == 0 && ext[84] == 1)
+	{
+		
+		small[84] = 0;
+		big[84] = 3;
+		num[84] = 1;
+		while (small[4] < 30)
+		{
+			if (time[85] >= small[84] && time[85] < big[84])
+			{
+				image(expl[num[4]],x[15]-25,y[15]-25,30,30);
+			}
+		
+			num[84] += 1;
+			small[84] += 3;
+			big[84] += 3;
+		
+		}
+		
+		if (time[85] < 20)
+		{
+			time[85] += 0.5;
+		}
+	}
+	
+	if (time[85] >= 20 && ext[84] == 1)
+	{
+		
+		time[85] = 0;
+		x[15] = -1500;
+		ext[84] = 0;
+	}
+	
+	
+	//PICCOLOA DOS MORTE
+	if (dist[14] <= 15 && fire1 == 1 && s6 == 1)
+	{
+		soundManager.play('s6');
+		
+		s6 = 0;
+		ext[85] = 1;
+		fire1 = 0;
+		
+	}
+	
+	if (s6 == 0 && ext[85] == 1)
+	{
+		
+		small[85] = 0;
+		big[85] = 3;
+		num[85] = 1;
+		while (small[85] < 30)
+		{
+			if (time[86] >= small[85] && time[86] < big[85])
+			{
+				image(expl[num[85]],x[16]-25,y[16]-25,30,30);
+			}
+		
+			num[85] += 1;
+			small[85] += 3;
+			big[85] += 3;
+		
+		}
+		
+		if (time[86] < 20)
+		{
+			time[86] += 0.5;
+		}
+	}
+	
+	if (time[86] >= 20 && ext[85] == 1)
+	{
+		
+		time[86] = 0;
+		x[16] = -1500;
+		ext[85] = 0;
+	}
+	
+	
+	//PICCOLOA TRES MORTE
+	
+	if (dist[15] <= 15 && fire1 == 1 && s7 == 1)
+	{
+		soundManager.play('s6');
+		
+		s7 = 0;	
+		ext[86] = 1;
+		fire1 = 0;
+		
+	}
+	
+	if (s7 == 0 && ext[86] == 1)
+	{
+		
+		small[86] = 0;
+		big[86] = 3;
+		num[86] = 1;
+		while (small[86] < 30)
+		{
+			if (time[87] >= small[86] && time[87] < big[86])
+			{
+				image(expl[num[86]],x[17]-25,y[17]-25,30,30);
+			}
+		
+			num[86] += 1;
+			small[86] += 3;
+			big[86] += 3;
+		
+		}
+		
+		if (time[87] < 20)
+		{
+			time[87] += 0.5;
+		}
+	}
+	
+	if (time[87] >= 20 && ext[86] == 1)
+	{
+		
+		time[87] = 0;
+		x[17] = -1500;
+		ext[86] = 0;
+	}
+	
+	
+	//PICCOLOA CUATRO MORTE
+	
+	if (dist[16] <= 15 && fire1 == 1 && s8 == 1)
+	{
+		soundManager.play('s6');
+		
+		s8 = 0;
+		ext[87] = 1;
+		fire1 = 0;
+		
+	}
+	
+	if (s8 == 0 && ext[87] == 1)
+	{
+		
+		small[87] = 0;
+		big[87] = 3;
+		num[87] = 1;
+		while (small[87] < 30)
+		{
+			if (time[88] >= small[87] && time[88] < big[87])
+			{
+				image(expl[num[87]],x[18]-25,y[18]-25,30,30);
+			}
+		
+			num[87] += 1;
+			small[87] += 3;
+			big[87] += 3;
+		
+		}
+		
+		if (time[88] < 20)
+		{
+			time[88] += 0.5;
+		}
+	}
+	
+	if (time[88] >= 20 && ext[87] == 1)
+	{
+		
+		time[88] = 0;
+		x[18] = -1500;
+		ext[87] = 0;
+	}
+	
+	//WIN THE STAGE (ALL OBJECTS DESTROYED)
+	
+	if (b1 == 0 && m1 == 0 && m2 == 0 && s1 == 0 && s2 == 0 && s3 == 0 && s4 == 0 && ext[0] == 0 && ext[2] == 0 && ext[3] == 0 && ext[4] == 0 && ext[5] == 0 && ext[6] == 0 && ext[7] == 0)
+	{
+		if (b2 == 0 && m3 == 0 && m4 == 0 && s5 == 0 && s6 == 0 && s7 == 0 && s8 == 0 && ext[80] == 0 && ext[82] == 0 && ext[83] == 0 && ext[84] == 0 && ext[85] == 0 && ext[86] == 0 && ext[87] == 0)
+		{
+			gameWon = 1;
+		}
+	}
+	
+//COLLISION (GAME OVER) PLAYER HITS OBJECTS-----------------------------------------------
+	//distance formula
+	dist[17] = (int)sqrt(sq(x[0]-x[5])+sq(y[0]-y[5]));
+	dist[18] = (int)sqrt(sq(x[0]-x[6])+sq(y[0]-y[6]));
+	dist[19] = (int)sqrt(sq(x[0]-x[7])+sq(y[0]-y[7]));
+	dist[20] = (int)sqrt(sq(x[0]-x[8])+sq(y[0]-y[8]));
+	dist[21] = (int)sqrt(sq(x[0]-x[9])+sq(y[0]-y[9]));
+	dist[22] = (int)sqrt(sq(x[0]-x[10])+sq(y[0]-y[10]));
+	dist[23] = (int)sqrt(sq(x[0]-x[11])+sq(y[0]-y[11]));
+	
+	dist[24] = (int)sqrt(sq(x[0]-x[12])+sq(y[0]-y[12]));
+	dist[25] = (int)sqrt(sq(x[0]-x[13])+sq(y[0]-y[13]));
+	dist[26] = (int)sqrt(sq(x[0]-x[14])+sq(y[0]-y[14]));
+	dist[27] = (int)sqrt(sq(x[0]-x[15])+sq(y[0]-y[15]));
+	dist[28] = (int)sqrt(sq(x[0]-x[16])+sq(y[0]-y[16]));
+	dist[29] = (int)sqrt(sq(x[0]-x[17])+sq(y[0]-y[17]));
+	dist[30] = (int)sqrt(sq(x[0]-x[18])+sq(y[0]-y[18]));
+	
+	//collision
+	
+	if (dist[17] <= 50 || dist[18] <= 30 || dist[19] <= 30 || dist[20] <= 15 || dist[21] <= 15 || dist[22] <= 15 || dist[23] <= 15 || dist[24] <= 50 || dist[25] <= 30 || dist[26] <= 30 || dist[27] <= 15 || dist[28] <= 15 || dist[29] <= 15 || dist[30] <= 15)
+	{
+		if (b1 == 1 || m1 == 1 || m2 == 1 || s1 == 1 || s2 == 1 || s3 == 1 || s4 == 1 || b2 == 1 || m3 == 1 || m4 == 1 || s5 == 1 || s6 == 1 || s7 == 1 || s8 == 1)
+		{
+			
+			gameOver = 1;
+			
+		}
+	}
+	
+	//ELECTRIC SHOCK
+	
+	if (x[0]-15 <= 25 || x[0]-15 >= 650 || y[0]-15 <= 25 || y[0]-15 >= 450)
+	{
+		gameOver = 1;
+	}
+	
+	
+//GAME WON >> NEXT STAGE------------------------------------------------------------------
+	if (gameWon == 1)
+	{
+		soundManager.play('s1');
+		
+		next = 1;
+	}
+
+	if (next == 1)
+	{
+		link ("clear.html");
+	}
+
+//TIME LIMIT------------------------------------------------------------------
+	//add one minute to current time after 60s
+	if(second() == 0)
+	{
+		if(timeControl == 0)
+		{
+			minuteMultiplier = minuteMultiplier + 1;
+			timeControl = 1;
+		}
+		
+		
+	}
+	else
+	{	
+		timeControl = 0;
+	}
+	
+	currentTime = 60 * minuteMultiplier + second() - initialTime;
+	if(currentTime >= 0 && currentTime < 50)
+	{
+		fill(255);
+		textFont(bird,30);
+		text(60 - currentTime,30,50);
+	}
+	
+	//after 30s >> FASTER MONSTERS
+	if(currentTime >= 30)
+	{
+		speed = 2;
+	}
+	
+	//after 45s >> EVEN FASTER MONSTERS
+	if(currentTime >= 45)
+	{
+		speed = 3;
+	}
+	
+	//after 50s >> RED TIME COUNTER
+	if(currentTime >= 50)
+	{
+		fill(255,0,0);
+		text(60 - currentTime,50,100);
+	}
+		
+	//after 1min >> END GAME
+	if(currentTime >= 60)
+	{
+		gameOver = 1;
+	}
+
+
+
+//KEYBOARD CONTROL------------------------------------------------------------------------
+	//move right/left/up/down
+	if(rightKey == 1 && x[1] < 680)
+	{
+		x[1] = x[1] + 5;
+	}
+	
+	if(leftKey == 1 && x[1] > 20)
+	{
+		x[1] = x[1] - 5;
+	}
+	
+	if(upKey == 1 && y[1] > 10)
+	{
+		y[1] = y[1] - 5;
+	}
+	
+	if(downKey == 1 && y[1] < 490)
+	{
+		y[1] = y[1] + 5;
+	}
+	
+	
+	if(spaceKey == 1 && fire1 == 0)
+	{
+		soundManager.play('s5');
+		
+		fire1 = 1;
+		
+		x[3] = targetX;
+		y[3] = targetY;
+		
+		slope = (y[3]-y[2])/(x[3]-x[2]);
+		x[4] = (x[3]-x[2]);
+		y[4] = (y[3]-y[2]);
+	}
+	
+	
+	
+//TARGET----------------------------------------------------------------------------------
+	if(fire1 == 0)
+	{
+		fill(255)
+		image(target,targetX,targetY,30,30);
+	}
+
+}
+
+void keyPressed ()
+{
+//KEY CONTROLS
+	if(keyCode == RIGHT)
+	{
+		rightKey = 1;
+	}
+	
+	if(keyCode == LEFT)
+	{
+		leftKey = 1;
+	}
+	
+	if(keyCode == UP)
+	{
+		upKey = 1;
+	}
+	
+	if(keyCode == DOWN)
+	{
+		downKey = 1;
+	}
+	
+	if (keyCode == ' ')
+	{
+		spaceKey = 1;
+
+	}
+	
+//TARGET
+
+	if(keyCode == 'D')	//target RIGHT
+	{
+		targetX = x[1] + 50;
+		targetY = y[1];
+	}
+	
+	if(keyCode == 'A')	//target LEFT
+	{
+		targetX = x[1] - 50;
+		targetY = y[1];
+	}
+	
+	if(keyCode == 'W')	//target UP
+	{
+		targetX = x[1];
+		targetY = y[1] - 50;
+	}
+
+	if(keyCode == 'S')	//target DOWN
+	{
+		targetX = x[1];
+		targetY = y[1] + 50;
+	}
+	
+}
+
+void keyReleased ()
+{
+	if(keyCode == RIGHT)
+	{
+		rightKey = 0;
+	}
+	
+	if(keyCode == LEFT)
+	{
+		leftKey = 0;
+	}
+	
+	if(keyCode == UP)
+	{
+		upKey = 0;
+	}
+	
+	if(keyCode == DOWN)
+	{
+		downKey = 0;
+	}
+	
+	if (keyCode == ' ')
+	{
+		spaceKey = 0;
+	}
+}
+
+
+    </script>
+    <canvas id="mycanvas"></canvas>
+</center>
+
+</head>
+
+<body>
+</body>
+</html>

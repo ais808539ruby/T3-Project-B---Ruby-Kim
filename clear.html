@@ -1,0 +1,393 @@
+<html>
+<head>
+<title> Game </title>
+
+<!-- copy and paste the next 2 lines to setup the sound files, you must modify the loadsoundchrome.js file with your sounds -->
+<script type="text/javascript" src="script/soundmanager2.js"></script>
+<script type="text/javascript" src="script/loadsoundchrome.js"></script>
+<!-- Stop copying here -->
+
+<center>
+    <script type="text/javascript" src="script/processing-1.4.1.js"></script>
+    <script type="text/processing" data-processing-target="mycanvas">
+
+/* @pjs globalKeyEvents = "true"; */
+
+int start;					//start bgm
+
+//back ground
+PImage blu;
+int x, y;					//x and y of object null (start from 0)
+int dx, dy;					//direction of x and y hence dx dy
+int x1, y1;					//object 1
+int dx1, dy1;				//direction of object 1
+int x2, y2;					//obj 2
+int dx2, dy2;				//direction of obj 2
+int x3, y3;					//obj 3
+int dx3, dy3;				//direction of obj 3
+int x4, y4;					//obj 4
+int dx4, dy4;				//direction of obj 4
+int x5, y5;					//obj 5
+int dx5, dy5;				//direction of obj 5
+
+//image
+PImage clear;
+
+void setup()
+{  
+    size( 700, 500 );  
+    background(0,0,0);
+    frameRate( 60 );
+	
+	blu = loadImage ("image/blue.png");
+	
+	start = 1;
+	
+	x = 50;
+	y = 50;
+	dx = 1;
+	dy = 1;
+	
+	x1 = 50;
+	y1 = 400;
+	dx1 = 1;
+	dy1 = 0;
+	
+	x2 = 250;
+	y2 = 50;
+	dx2 = 1;
+	dy2 = 1;
+	
+	x3 = 250;
+	y3 = 400;
+	dx3 = 0;
+	dy3 = 0;
+	
+	x4 = 400;
+	y4 = 50;
+	dx4 = 0;
+	dy4 = 1;
+	
+	x5 = 400;
+	y5 = 400;
+	dx5 = 0;
+	dy5 = 1;
+	
+	//image
+	clear = loadImage ("image/clear.png");
+	
+}  
+
+
+void draw()
+{
+    background(0,0,0);
+    frameRate ( 60 );
+
+	if (start == 1)
+	{
+		soundManager.play('s4');
+		start = 0;
+	}
+	
+//OBJECTS------------------------------------------------------------------------
+	fill (255,0,0);
+	strokeWeight (2);
+	
+	fill (255,0,0);
+	
+	image (blu,x-25,y-25,50,50);
+	image (blu,x1-25,y1-25,50,50);
+	image (blu,x2-25,y2-25,50,50);
+	image (blu,x3-25,y3-25,50,50);
+	image (blu,x4-25,y4-25,50,50);
+	image (blu,x5-25,y5-25,50,50);
+	
+//GAME OVER-------------------------------------------------------------------------------
+	fill (255,255,255);
+	image(clear, 65,120,600,200);
+	text ("PRESS R", 335,270);
+
+//OBJECT 0
+	if (dx == 0)
+	{
+		x = x - 5;
+	}
+	
+	if (dx == 1)
+	{
+		x = x + 5;
+	}
+	
+	if (dy == 0)
+	{
+		y = y - 5;
+	}
+	
+	if (dy == 1)
+	{
+		y = y + 5;
+	}
+	
+//OBJECT 1
+	if (dx1 == 0)
+	{
+		x1 = x1 - 5;
+	}
+	
+	if (dx1 == 1)
+	{
+		x1 = x1 + 5;
+	}
+	
+	if (dy1 == 0)
+	{
+		y1 = y1 - 5;
+	}
+	
+	if (dy1 == 1)
+	{
+		y1 = y1 + 5;
+	}
+	
+//OBJECT 2
+	if (dx2 == 0)
+	{
+		x2 = x2 - 5;
+	}
+	
+	if (dx2 == 1)
+	{
+		x2 = x2 + 5;
+	}
+	
+	if (dy2 == 0)
+	{
+		y2 = y2 - 5;
+	}
+	
+	if (dy2 == 1)
+	{
+		y2 = y2 + 5;
+	}
+	
+//OBJECT 3
+	if (dx3 == 0)
+	{
+		x3 = x3 - 5;
+	}
+	
+	if (dx3 == 1)
+	{
+		x3 = x3 + 5;
+	}
+	
+	if (dy3 == 0)
+	{
+		y3 = y3 - 5;
+	}
+	
+	if (dy3 == 1)
+	{
+		y3 = y3 + 5;
+	}
+	
+//OBJECT 4
+	if (dx4 == 0)
+	{
+		x4 = x4 - 5;
+	}
+	
+	if (dx4 == 1)
+	{
+		x4 = x4 + 5;
+	}
+	
+	if (dy4 == 0)
+	{
+		y4 = y4 - 5;
+	}
+	
+	if (dy4 == 1)
+	{
+		y4 = y4 + 5;
+	}
+	
+//OBJECT 5
+	if (dx5 == 0)
+	{
+		x5 = x5 - 5;
+	}
+	
+	if (dx5 == 1)
+	{
+		x5 = x5 + 5;
+	}
+	
+	if (dy5 == 0)
+	{
+		y5 = y5 - 5;
+	}
+	
+	if (dy5 == 1)
+	{
+		y5 = y5 + 5;
+	}
+	
+//CONDITIONS---------------------------------------------------------------------
+
+//OBJECT 0
+	if (x >= 670)
+	{
+		dx = 0;
+	}
+	
+	if (x <= 30)
+	{
+		dx = 1;
+	}
+	
+	if (y >= 470)
+	{
+		dy = 0;
+	}
+	
+	if (y <= 30)
+	{
+		dy = 1;
+	}
+	
+//OBJECT 1
+	if (x1 >= 670)
+	{
+		dx1 = 0;
+	}
+	
+	if (x1 <= 30)
+	{
+		dx1 = 1;
+	}
+	
+	if (y1 >= 470)
+	{
+		dy1 = 0;
+	}
+	
+	if (y1 <= 30)
+	{
+		dy1 = 1;
+	}
+
+//OBJECT 2
+	if (x2 >= 670)
+	{
+		dx2 = 0;
+	}
+	
+	if (x2 <= 30)
+	{
+		dx2 = 1;
+	}
+	
+	if (y2 >= 470)
+	{
+		dy2 = 0;
+	}
+	
+	if (y2 <= 30)
+	{
+		dy2 = 1;
+	}
+
+//OBJECT 3
+	if (x3 >= 670)
+	{
+		dx3 = 0;
+	}
+	
+	if (x3 <= 30)
+	{
+		dx3 = 1;
+	}
+	
+	if (y3 >= 470)
+	{
+		dy3 = 0;
+	}
+	
+	if (y3 <= 30)
+	{
+		dy3 = 1;
+	}
+	
+//OBJECT 4
+	if (x4 >= 670)
+	{
+		dx4 = 0;
+	}
+	
+	if (x4 <= 30)
+	{
+		dx4 = 1;
+	}
+	
+	if (y4 >= 470)
+	{
+		dy4 = 0;
+	}
+	
+	if (y4 <= 30)
+	{
+		dy4 = 1;
+	}
+	
+//OBJECT 5
+	if (x5 >= 670)
+	{
+		dx5 = 0;
+	}
+	
+	if (x5 <= 30)
+	{
+		dx5 = 1;
+	}
+	
+	if (y5 >= 470)
+	{
+		dy5 = 0;
+	}
+	
+	if (y5 <= 30)
+	{
+		dy5 = 1;
+	}
+	
+	
+	
+	
+
+}
+
+void keyPressed ()
+{
+	if (key == 'r')
+	{
+		link ("index.html");
+	}
+}
+
+void mousePressed ()
+{
+	
+}
+
+
+    </script>
+    <canvas id="mycanvas"></canvas>
+</center>
+
+</head>
+
+<body>
+</body>
+</html>
